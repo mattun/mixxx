@@ -118,6 +118,27 @@ QString computeSettingsPath(const QString& configFilename) {
 }
 
 }  // namespace
+
+Config* Config::instance() {
+    static Config instance;
+    return &instance;
+}
+
+void Config::setOscIp(const QString& ip) {
+    m_oscIp = ip;
+}
+
+QString Config::getOscIp() const {
+    return m_oscIp;
+}
+
+void Config::setOscPort(int port) {
+    m_oscPort = port;
+}
+
+int Config::getOscPort() const {
+    return m_oscPort;
+}
 // static
 ConfigKey ConfigKey::parseCommaSeparated(const QString& key) {
     int comma = key.indexOf(",");

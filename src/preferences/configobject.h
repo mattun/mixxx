@@ -13,6 +13,19 @@
 #include "util/compatibility/qhash.h"
 #include "util/debug.h"
 
+class Config {
+public:
+    static Config* instance();
+    void setOscIp(const QString& ip);
+    QString getOscIp() const;
+    void setOscPort(int port);
+    int getOscPort() const;
+
+private:
+    QString m_oscIp = "192.168.11.20";
+    int m_oscPort = 10000;
+};
+
 // Class for the key for a specific configuration element. A key consists of a
 // group and an item.
 class ConfigKey final {

@@ -29,6 +29,9 @@
 #include "util/sandbox.h"
 #include "util/versionstore.h"
 
+#include <QCommandLineParser>
+#include "preferences/configobject.h"
+
 namespace {
 
 // Exit codes
@@ -145,6 +148,29 @@ void adjustScaleFactor(CmdlineArgs* pArgs) {
 } // anonymous namespace
 
 int main(int argc, char * argv[]) {
+    QApplication a(argc, argv);
+
+    QCommandLineParser parser;
+    parser.addHelpOption();
+    parser.addOption(QCommandLineOption("osc-ip", "OSC送信先IPアドレス", "ip"));
+    parser.addOption(QCommandLineOption("osc-port", "OSC送信先ポート番号", "port"));
+    parser.process(a);
+
+    QString oscIp = parser.value("osc-ip");
+    QString oscPort = parser.value("osc-port");
+    if (!oscIp.isEmpty()) {
+        // グローバル設定オブジェクトにIPを保存
+        Config::instance()->setOscIp(oscIp);
+    }
+    if (!oscPort.isEmpty()) {
+        bool ok;
+        int port = oscPort.toInt(&ok);
+        if (ok && port > 0 && port < 65536) {
+            // グローバル設定オブジェクトにポートを保存
+            Config::instance()->setOscPort(port);
+        }
+    }
+
     Console console;
 
     // These need to be set early on (not sure how early) in order to trigger

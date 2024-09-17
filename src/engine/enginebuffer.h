@@ -18,6 +18,9 @@
 #include "track/track_decl.h"
 #include "util/types.h"
 
+// OSC
+#include <lo/lo.h>
+
 #ifdef __RUBBERBAND__
 #include "engine/bufferscalers/enginebufferscalerubberband.h"
 #endif
@@ -264,6 +267,7 @@ class EngineBuffer : public EngineObject {
     void enableIndependentPitchTempoScaling(bool bEnable,
                                             const int iBufferSize);
 
+    void sendOSCPlayPos();
     void updateIndicators(double rate, int iBufferSize);
 
     void hintReader(const double rate);

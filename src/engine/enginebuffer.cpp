@@ -41,6 +41,8 @@
 #include "engine/controls/vinylcontrolcontrol.h"
 #endif
 
+#include "preferences/configobject.h"
+
 namespace {
 const mixxx::Logger kLogger("EngineBuffer");
 
@@ -1147,6 +1149,10 @@ void EngineBuffer::processTrackLocked(
         // m_playPos is already updated here and points to the end of the played buffer
         pControl->setFrameInfo(m_playPos, trackEndPosition, m_trackSampleRateOld);
         pControl->process(rate, m_playPos, iBufferSize);
+
+        // qWarning() << "m_playPos:" << m_playPos;
+        // Send m_playPos via OSC
+        sendOSCPlayPos();
     }
 
     m_scratching_old = is_scratching;
@@ -1176,6 +1182,17 @@ void EngineBuffer::processTrackLocked(
     // Give the Reader hints as to which chunks of the current song we
     // really care about. It will try very hard to keep these in memory
     hintReader(rate);
+}
+
+void EngineBuffer::sendOSCPlayPos() {
+    if (m_playPos.isValid()) {
+        QString oscIp = Config::instance()->getOscIp();
+        int oscPort = Config::instance()->getOscPort();
+        lo_address oscAddress = lo_address_new(oscIp.toUtf8().constData(), QString::number(oscPort).toUtf8().constData());
+        lo_send(oscAddress, "/mixxx/playposition", "d", m_playPos.toSamplePos(m_channelCount));
+        lo_send(oscAddress, "/mixxx/trackEndPosition", "d", m_trackEndPositionOld.value());
+        lo_address_free(oscAddress);
+    }
 }
 
 void EngineBuffer::process(CSAMPLE* pOutput, const int iBufferSize) {
